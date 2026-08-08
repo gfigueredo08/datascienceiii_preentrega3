@@ -69,8 +69,7 @@ Se eligió **LinearSVC** por tener el mejor F1-macro, aunque la diferencia con l
 ```
 
 ### Análisis de la matriz de confusión
-- **Sports es la clase con menor confusión** (F1 = 0.960): su vocabulario es muy distintivo (nombres de equipos, resultados, jugadores) y casi no se confunde con las demás.
+- **Sports es la clase con menor confusión** (F1 = 0.960): su vocabulario es bastante distintivo, por lo que casi no se confunde con las demás.
 - **Business ↔ Sci_Tech es la mayor confusión existente** (35 Business clasificadas como Sci_Tech, 43 Sci_Tech clasificadas como Business). Esto debido a que buena parte de las noticias de tecnología
-  en AG News son sobre negocios de empresas tecnológicas (adquisiciones, resultados financieros), por lo que el vocabulario se superpone genuinamente entre ambas categorías — no es un error del
-  pipeline sino ambigüedad real del dominio.
+  en AG News son sobre negocios de empresas tecnológicas (adquisiciones, resultados financieros), por lo que el vocabulario se superpone entre ambas categorías.
 - **World se confunde moderadamente con Business** (30 casos): noticias de política internacional con impacto económico (comercio, sanciones) comparten vocabulario con ambas categorías.
