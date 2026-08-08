@@ -1,17 +1,13 @@
 """
 preprocessing.py
 ----------------
-Lógica de limpieza (Regex + normalización) y lematización con SpaCy,
-consolidada para la Pre-Entrega N°2 (Módulo 2: EDA técnico de NLP).
+Lógica de limpieza (Regex + normalización) y lematización con SpaCy.
 """
 
 import html
 import re
 import spacy
 
-# Cargamos el modelo de inglés una sola vez.
-# Desactivamos parser y ner: no los necesitamos y así el pipeline corre
-# mucho más rápido (solo usamos tokenización + lematización + POS/stopwords).
 nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
 
 # El corpus AG News trae entidades HTML "rotas": les falta el "&" inicial
@@ -24,10 +20,8 @@ _NUMERIC_RE = re.compile(r"&?#(\d+);")
 
 def clean_text(text: str) -> str:
     """
-    Limpieza a nivel de string, vía Regex, ANTES de tokenizar.
-    - Decodifica entidades HTML (&lt;, &amp;, &quot;, etc.) a su forma real
-      para que los tags que codifican queden expuestos y se puedan eliminar
-      (si no, "&lt;FONT&gt;" sobrevive como ruido "lt font gt" en el corpus)
+    Limpieza a nivel de string, vía Regex, antes de tokenizar.
+    - Decodifica entidades HTML (&lt;, &amp;, &quot;, etc.) a su forma real para que los tags que codifican queden expuestos y se puedan eliminar (si no, "&lt;FONT&gt;" sobrevive como ruido "lt font gt" en el corpus)
     - Elimina tags HTML residuales (ya decodificados o literales)
     - Elimina URLs
     - Elimina caracteres que no sean letras (números, puntuación, símbolos)
@@ -46,11 +40,7 @@ def clean_text(text: str) -> str:
 
 
 def preprocess_text(text: str) -> str:
-    """
-    Pipeline completo: limpieza Regex -> tokenización y lematización con SpaCy.
-    Filtra stop-words estándar y tokens de un solo carácter (ruido).
-    Devuelve el texto ya lematizado, como string de tokens separados por espacio.
-    """
+
     cleaned = clean_text(text)
     doc = nlp(cleaned)
 
@@ -66,9 +56,7 @@ def preprocess_text(text: str) -> str:
 
 def preprocess_corpus(texts, batch_size: int = 64, n_process: int = 1):
     """
-    Versión batch de preprocess_text, usando nlp.pipe para procesar
-    todo un corpus de forma eficiente (en vez de doc-por-doc).
-    Aplica exactamente la misma lógica que preprocess_text.
+    Versión batch de preprocess_text, usando nlp.pipe para procesar todo un corpus de forma eficiente (en vez de doc-por-doc). Aplica exactamente la misma lógica que preprocess_text.
     """
     cleaned_texts = [clean_text(t) for t in texts]
     results = []
