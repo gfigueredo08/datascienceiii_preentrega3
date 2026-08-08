@@ -1,5 +1,5 @@
 """
-train.py — Pre-Entrega N°3: Clasificador supervisado con TF-IDF (AG News)
+train.py: Clasificador supervisado con TF-IDF
 """
 
 import sys, json
@@ -22,19 +22,18 @@ from preprocessing import preprocess_corpus
 
 RANDOM_STATE = 42
 
-# 1. Carga de datos (splits provistos por la cátedra, no se tocan entre sí)
+# 1. Carga de datos
 train_df, test_df = cargar()
 
-# 2. Preprocesamiento (mismas funciones del Módulo 2: regex + lematización SpaCy)
+# 2. Preprocesamiento
 train_df["text_clean"] = preprocess_corpus(train_df["text"].tolist())
 test_df["text_clean"] = preprocess_corpus(test_df["text"].tolist())
 
 X_train, y_train = train_df["text_clean"], train_df["label"]
 X_test, y_test = test_df["text_clean"], test_df["label"]
 
-# 3. Búsqueda de la mejor combinación (vectorizador + modelo) SOLO con datos de train.
-#    GridSearchCV hace fit_transform del TF-IDF únicamente sobre los folds de train
-#    en cada iteración de la cross-validation -> el test nunca se toca acá.
+# 3. Búsqueda de la mejor combinación (vectorizador + modelo) solo con datos de train.
+#    GridSearchCV hace fit_transform del TF-IDF únicamente sobre los folds de train en cada iteración de la cross-validation. El test nunca se toca.
 param_grid_common = {
     "tfidf__max_features": [5000, 10000, None],
     "tfidf__ngram_range": [(1, 1), (1, 2)],
@@ -72,8 +71,7 @@ resultados_df.to_csv("comparacion_modelos.csv", index=False)
 print("\nComparación de modelos (ordenado por f1_macro en cross-validation):")
 print(resultados_df.to_string(index=False))
 
-# 4. Modelo ganador: se evalúa UNA sola vez sobre el test, ya vectorizado con
-#    el TF-IDF ajustado (fit) exclusivamente sobre train (dentro del Pipeline).
+# 4. Modelo ganador: se evalúa 1 sola vez sobre el test, ya vectorizado con el TF-IDF ajustado (fit) exclusivamente sobre train (dentro del Pipeline).
 mejor_nombre = resultados_df.iloc[0]["modelo"]
 mejor_pipeline = mejores_estimadores[mejor_nombre]
 print(f"\nModelo elegido: {mejor_nombre}")
