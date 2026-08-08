@@ -30,27 +30,21 @@ python train.py
 ## Decisiones y justificación
 
 ### Prevención de data leakage
-El `TfidfVectorizer` va **dentro de un `Pipeline`** junto con el clasificador. Durante
-`GridSearchCV` (5-fold cross-validation), el `fit_transform` del vectorizador se hace únicamente
-sobre los folds de entrenamiento de cada iteración; los datos de test **nunca se usan** para
-ajustar el vocabulario ni los pesos IDF. 
-Recién al final, el pipeline ganador se usa con `.predict()` (que internamente solo hace `.transform()`, no
-`.fit()`) sobre `test`.
+El `TfidfVectorizer` va **dentro de un `Pipeline`** junto con el clasificador. Durante `GridSearchCV` (5-fold cross-validation), el `fit_transform` del vectorizador se hace únicamente
+sobre los folds de entrenamiento de cada iteración; los datos de test **nunca se usan** para ajustar el vocabulario ni los pesos IDF. 
+Recién al final, el pipeline ganador se usa con `.predict()` (que internamente solo hace `.transform()`, no `.fit()`) sobre `test`.
 
 ### Búsqueda de hiperparámetros del vectorizador
 Se probaron combinaciones de:
 - `max_features`: `5000`, `10000`, `None` (sin límite)
 - `ngram_range`: `(1,1)` (solo unigramas) vs. `(1,2)` (unigramas + bigramas)
 
-En los tres modelos evaluados, la mejor combinación fue **`ngram_range=(1,2)`** ya que los bigramas
-("oil price", "prime minister") aportan señal que los unigramas solos no capturan. El
-`max_features=None` (vocabulario completo) ganó en 2 de 3 modelos, lo cual tiene sentido: el
-corpus ya viene lematizado y sin stop-words desde el Módulo 2, así que el vocabulario resultante
+En los tres modelos evaluados, la mejor combinación fue **`ngram_range=(1,2)`** ya que los bigramas ("oil price", "prime minister") aportan señal que los unigramas solos no capturan. El
+`max_features=None` (vocabulario completo) ganó en 2 de 3 modelos, lo cual tiene sentido: el corpus ya viene lematizado y sin stop-words desde el Módulo 2, así que el vocabulario resultante
 no es tan ruidoso como para necesitar recortarlo agresivamente.
 
 ### Elección del modelo
-Se compararon tres clasificadores de referencia, cada uno con su propia búsqueda de
-hiperparámetros del vectorizador, usando **F1-macro en cross-validation (5 folds) sobre train**
+Se compararon tres clasificadores de referencia, cada uno con su propia búsqueda de hiperparámetros del vectorizador, usando **F1-macro en cross-validation (5 folds) sobre train**
 como criterio de selección:
 
 | Modelo | F1-macro (CV, train) | max_features | ngram_range |
@@ -59,15 +53,12 @@ como criterio de selección:
 | MultinomialNB | 0.892 | sin límite | (1,2) |
 | LogisticRegression | 0.889 | 10.000 | (1,2) |
 
-Se eligió **LinearSVC** por tener el mejor F1-macro, aunque la
-diferencia con los otros dos es mínima (~0.5 puntos). Con vectores TF-IDF de alta dimensión y dispersos, los clasificadores lineales
-(SVM lineal, Regresión Logística) suelen superar a Naive Bayes, cuyo supuesto de independencia
-condicional entre features es más restrictivo. LinearSVC además es muy eficiente en este régimen
+Se eligió **LinearSVC** por tener el mejor F1-macro, aunque la diferencia con los otros dos es mínima (~0.5 puntos). Con vectores TF-IDF de alta dimensión y dispersos, los clasificadores lineales
+(SVM lineal, Regresión Logística) suelen superar a Naive Bayes, cuyo supuesto de independencia condicional entre features es más restrictivo. LinearSVC además es muy eficiente en este régimen
 (texto, alta dimensionalidad, pocas muestras relativas a features).
 
 ### Resultado final sobre test
-**F1-macro = 0.903** (accuracy = 0.903), confirmando que el preprocesamiento (lematización +
-remoción de stop-words + fix de entidades HTML) le está dando al modelo tokens de buena calidad.
+**F1-macro = 0.903** (accuracy = 0.903), confirmando que el preprocesamiento (lematización + remoción de stop-words + fix de entidades HTML) le está dando al modelo tokens de buena calidad.
 
 ```
               precision    recall  f1-score   support
@@ -78,12 +69,8 @@ remoción de stop-words + fix de entidades HTML) le está dando al modelo tokens
 ```
 
 ### Análisis de la matriz de confusión
-- **Sports es la clase con menor confusión** (F1 = 0.960): su vocabulario es muy distintivo
-  (nombres de equipos, resultados, jugadores) y casi no se confunde con las demás.
-- **Business ↔ Sci_Tech es la mayor confusión existente** (35 Business clasificadas como Sci_Tech, 43
-  Sci_Tech clasificadas como Business). Esto debido a que buena parte de las noticias de tecnología
-  en AG News son sobre negocios de empresas tecnológicas (adquisiciones, resultados financieros),
-  por lo que el vocabulario se superpone genuinamente entre ambas categorías — no es un error del
+- **Sports es la clase con menor confusión** (F1 = 0.960): su vocabulario es muy distintivo (nombres de equipos, resultados, jugadores) y casi no se confunde con las demás.
+- **Business ↔ Sci_Tech es la mayor confusión existente** (35 Business clasificadas como Sci_Tech, 43 Sci_Tech clasificadas como Business). Esto debido a que buena parte de las noticias de tecnología
+  en AG News son sobre negocios de empresas tecnológicas (adquisiciones, resultados financieros), por lo que el vocabulario se superpone genuinamente entre ambas categorías — no es un error del
   pipeline sino ambigüedad real del dominio.
-- **World se confunde moderadamente con Business** (30 casos): noticias de política internacional
-  con impacto económico (comercio, sanciones) comparten vocabulario con ambas categorías.
+- **World se confunde moderadamente con Business** (30 casos): noticias de política internacional con impacto económico (comercio, sanciones) comparten vocabulario con ambas categorías.
