@@ -49,7 +49,7 @@ como criterio de selección:
 
 | Modelo | F1-macro (CV, train) | max_features | ngram_range |
 |---|---|---|---|
-| **LinearSVC** | **0.894** | sin límite | (1,2) |
+| **LinearSVC** | 0.894 | sin límite | (1,2) |
 | MultinomialNB | 0.892 | sin límite | (1,2) |
 | LogisticRegression | 0.889 | 10.000 | (1,2) |
 
