@@ -1,0 +1,13 @@
+Modelo: LinearSVC
+Vectorizador: TfidfVectorizer(ngram_range=(1, 2))
+
+              precision    recall  f1-score   support
+
+    Business      0.847     0.874     0.860       500
+    Sci_Tech      0.901     0.872     0.886       500
+      Sports      0.951     0.970     0.960       500
+       World      0.916     0.898     0.907       500
+
+    accuracy                          0.903      2000
+   macro avg      0.904     0.904     0.903      2000
+weighted avg      0.904     0.903     0.903      2000
