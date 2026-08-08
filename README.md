@@ -8,15 +8,15 @@ Toma el corpus AG News (mismo dataset y mismo preprocesamiento del Módulo 2), l
 ## Estructura
 ```
 preentrega3/
-├── ag_news/                      # ag_news_train.csv, ag_news_test.csv (provistos por la cátedra)
+├── ag_news/                      # ag_news_train.csv, ag_news_test.csv
 ├── scripts/
-│   ├── preprocessing.py          # reutilizado tal cual del Módulo 2 (regex + lematización SpaCy)
+│   ├── preprocessing.py          # regex + lematización SpaCy
 │   └── train.py                  # vectorización, comparación de modelos, evaluación
 ├── figures/
 │   └── matriz_confusion.png
 ├── classification_report.txt
 ├── comparacion_modelos.csv
-├── cargar_dataset.py             # loader provisto por la cátedra
+├── cargar_dataset.py            
 ├── requirements.txt
 └── README.md
 ```
@@ -32,7 +32,7 @@ python train.py
 ## Decisiones y justificación
 
 ### Prevención de data leakage
-El `TfidfVectorizer` va **dentro de un `Pipeline`** junto con el clasificador. Durante la
+El `TfidfVectorizer` va **dentro de un `Pipeline`** junto con el clasificador. Durante
 `GridSearchCV` (5-fold cross-validation), el `fit_transform` del vectorizador se hace únicamente
 sobre los folds de entrenamiento de cada iteración; los datos de test **nunca se usan** para
 ajustar el vocabulario ni los pesos IDF. Recién al final, el pipeline ganador —ya entrenado sobre
@@ -91,7 +91,3 @@ remoción de stop-words + fix de entidades HTML) le está dando al modelo tokens
   categorías — no es un error del pipeline sino ambigüedad real del dominio.
 - **World se confunde moderadamente con Business** (30 casos): noticias de política internacional
   con impacto económico (comercio, sanciones) comparten vocabulario con ambas categorías.
-
-## Próximos pasos
-Este mismo corpus preprocesado y este baseline TF-IDF (F1-macro 0.903) sirven como punto de
-comparación para el Módulo 4 (fine-tuning con Transformers + LoRA) y para el Proyecto Final.
